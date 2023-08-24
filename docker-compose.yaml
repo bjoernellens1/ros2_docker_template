@@ -1,0 +1,259 @@
+version: "3.9"
+
+services: # in docker compose, service are definitions of your docker containers
+  # Base image containing dependencies for example the robot controller
+  base:
+    image: ghcr.io/bjoernellens1/ros2_rmp/rmp:base # this will be the output image tag
+    build:
+      context: .
+      dockerfile: docker/Dockerfile # the Dockerfilespeciefies the steps taken in the build process.
+      args:
+        ROS_DISTRO: humble
+      target: base # here you specify the build target in the Dockerfile
+      x-bake:
+        platforms:
+          #- linux/arm64 uncomment if arm64 platform is needed (like jetson nano or raspberry pi)
+          - linux/amd64
+
+    # Interactive shell enable
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2 
+    network_mode: host # host networking makes life easier
+    ipc: host # --> faster communications between containers
+    
+    # Needed to display graphical applications
+    privileged: true # also needed for hardware access like joystick, cameras...
+    environment:
+      # Allows graphical programs in the container.
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    volumes:
+      # Allows graphical programs in the container.
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
+    devices: # all devices you may need inside the docker container (for instance I needed a joystick here)
+      - /dev/input/js0:/dev/input/js0 # mapping in docker is always host_path:container_path
+
+  # Overlay image containing the extended project packages. For instance Mapping, Navigation which may run on a separate PC, so I divided that from the base image.
+  overlay:
+    extends: base # this means you take the base image as reference and run your service on top of that
+    image: ghcr.io/bjoernellens1/ros2_rmp/rmp:overlay
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      tags:
+        - ghcr.io/bjoernellens1/ros2_rmp/rmp:overlay
+      target: overlay
+      x-bake:
+        platforms:
+          #- linux/arm64 uncomment if arm64 platform is needed (like jetson nano or raspberry pi)
+          - linux/amd64
+    volumes:
+      - .:/repo
+    command: >
+      /bin/bash
+
+  # Additional dependencies for GUI applications: For my configuration, this last (biggest size) image will house the additional GUI tools like rviz2, gazebo, etc. This comes last as this extends the previous images. Won't be needed running on the robot. More suited for visualization, analysis or control on a separate PC.
+  guis:
+    extends: overlay
+    image: ghcr.io/bjoernellens1/ros2_rmp/rmp:guis
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      tags:
+        - ghcr.io/bjoernellens1/ros2_rmp/rmp:guis
+      target: guis
+      x-bake:
+        platforms:
+          #- linux/arm64 uncomment if arm64 platform is needed (like jetson nano or raspberry pi)
+          - linux/amd64
+    #entrypoint: /bin/bash
+    command: >
+      /bin/bash
+  
+  # The following service definitions do not include build instructions as they do not require additional content in the images. Meaning, if you already have the image locally, everything's fine. If you don't have the image locally, docker compose will download the image from the image registry for you. If docker compose does not have access to the image registry, it will build the corresponding image for you (so better make sur you have access).
+# You can see these service definitions as an easy way to spin up separate containers for launching separate tasks. I use this to control the current operational mode of the robot (mapping or navigation an localization). In the end it's just spinning up launch files in separate containers.
+
+  # Robot State Publisher
+  rsp:
+    extends: overlay
+    command: >
+      ros2 launch cps_rmp220_support rsp.launch.py
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    environment:
+    - ROS_DOMAIN_ID=5
+
+  # Controller
+  controller:
+    extends: base 
+    command: >
+      ros2 run segwayrmp SmartCar --ros-args -r cmd_vel:=cmd_vel_out -p serial_full_name:=/dev/ttyUSB0
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    # Interactive shell
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    # Needed to display graphical applications
+    privileged: true
+    # depends_on:
+    #   - robot_state_publisher
+    environment:
+    - ROS_DOMAIN_ID=5
+    restart: unless-stopped
+
+  # teleop
+  teleop:
+    extends: base 
+    command: >
+      ros2 launch rmp220_teleop robot_joystick.launch.py 
+    devices:
+      - /dev/input/js0:/dev/input/js0
+    # Interactive shell
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    # Needed to display graphical applications
+    privileged: true
+    environment:
+    - ROS_DOMAIN_ID=5
+
+  # lidar
+  lidar:
+    extends: overlay
+    command: >
+      ros2 launch cps_rmp220_support robot_lidar.launch.py serial_port:=/dev/ttyUSB0
+
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    # depends_on:
+    #   - robot_state_publisher
+    environment:
+    - ROS_DOMAIN_ID=5
+    devices:
+      - /dev/ttyUSB1:/dev/ttyUSB1
+      - /dev/ttyUSB0:/dev/ttyUSB0
+
+  # localiaztion by ekf node
+  ekf:
+    extends: overlay
+    command: >
+      ros2 launch cps_rmp220_support robot_localization.launch.py
+    # Interactive shell
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    environment:
+    - ROS_DOMAIN_ID=5
+
+  # mapping
+  mapping:
+    extends: overlay
+    command: >
+      ros2 launch cps_rmp220_support robot_mapping.launch.py
+    # Interactive shell
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    environment:
+    - ROS_DOMAIN_ID=5
+
+  # slam_localization
+  localization:
+    extends: overlay
+    command: >
+      ros2 launch cps_rmp220_support robot_mapping_localization.launch.py map_file_name:=/repo/maps/map.yaml
+    # Interactive shell
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    environment:
+    - ROS_DOMAIN_ID=5
+
+  # amcl_localization
+  amcl:
+    extends: overlay
+    command: >
+      ros2 launch cps_rmp220_support robot_amcl.launch.py map:=/repo/maps/map.yaml
+    # Interactive shell
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    environment:
+    - ROS_DOMAIN_ID=5
+
+  # navigation
+  navigation:
+    extends: overlay
+    command: >
+      ros2 launch cps_rmp220_support robot_navigation.launch.py
+      map_subscribe_transient_local:=true
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    environment:
+    - ROS_DOMAIN_ID=5
+  
+  # bash
+  bash:
+    extends: overlay
+    command: >
+      /bin/bash
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    devices:
+      - /dev/input/js0:/dev/input/js0
+    environment:
+    - ROS_DOMAIN_ID=5
+
+  # rviz2
+  rviz2:
+    extends: guis
+    # command: >
+    #   ros2 launch cps_rmp220_support robot_rviz2.launch.py
+    command: >
+      ros2 launch cps_rmp220_support rviz.launch.py
+    # Interactive shell
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS 2
+    network_mode: host
+    ipc: host
+    # Needed to display graphical applications
+    privileged: true
+    environment:
+      # Allows graphical programs in the container.
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - ROS_DOMAIN_ID=5
+    volumes:
+      # Allows graphical programs in the container.
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
