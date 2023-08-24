@@ -1,14 +1,26 @@
 version: "3.9"
 
 services: # in docker compose, service are definitions of your docker containers
+
+  my_example: # for this example I am using a very simple docker build for reference: hello-world
+    image: hello-world # hello-world image. No prefix means it defaults the image registry to dockerhub
+    build:
+      context: .
+      dockerfile: docker/my_example.Dockerfile # the Dockerfile speciefies the steps taken in the build process.
+      target: hello-world # here you specify the build target in the Dockerfile
+      x-bake: # Definitions needed for buildx bake. This enhanced docker build system makes things much easier.
+        platforms:
+          #- linux/arm64 uncomment if arm64 platform is needed (like jetson nano or raspberry pi)
+          - linux/amd64
+          
   # Base image containing dependencies for example the robot controller
   base:
     image: ghcr.io/bjoernellens1/ros2_rmp/rmp:base # this will be the output image tag
     build:
       context: .
       dockerfile: docker/Dockerfile # the Dockerfilespeciefies the steps taken in the build process.
-      args:
-        ROS_DISTRO: humble
+      args: # specify build arguments. May use them to alter the build process.
+        ROS_DISTRO: humble # For instance you could change to foxy here.
       target: base # here you specify the build target in the Dockerfile
       x-bake:
         platforms:
@@ -75,17 +87,13 @@ services: # in docker compose, service are definitions of your docker containers
   
   # The following service definitions do not include build instructions as they do not require additional content in the images. Meaning, if you already have the image locally, everything's fine. If you don't have the image locally, docker compose will download the image from the image registry for you. If docker compose does not have access to the image registry, it will build the corresponding image for you (so better make sur you have access).
 # You can see these service definitions as an easy way to spin up separate containers for launching separate tasks. I use this to control the current operational mode of the robot (mapping or navigation an localization). In the end it's just spinning up launch files in separate containers.
+# Note that service definitions will always inherit the preferences from their "parent" service. However, you can overwrite them.
 
   # Robot State Publisher
   rsp:
     extends: overlay
     command: >
       ros2 launch cps_rmp220_support rsp.launch.py
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
     environment:
     - ROS_DOMAIN_ID=5
 
@@ -96,16 +104,6 @@ services: # in docker compose, service are definitions of your docker containers
       ros2 run segwayrmp SmartCar --ros-args -r cmd_vel:=cmd_vel_out -p serial_full_name:=/dev/ttyUSB0
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
-    # Interactive shell
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
-    # Needed to display graphical applications
-    privileged: true
-    # depends_on:
-    #   - robot_state_publisher
     environment:
     - ROS_DOMAIN_ID=5
     restart: unless-stopped
@@ -117,14 +115,6 @@ services: # in docker compose, service are definitions of your docker containers
       ros2 launch rmp220_teleop robot_joystick.launch.py 
     devices:
       - /dev/input/js0:/dev/input/js0
-    # Interactive shell
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
-    # Needed to display graphical applications
-    privileged: true
     environment:
     - ROS_DOMAIN_ID=5
 
@@ -133,14 +123,6 @@ services: # in docker compose, service are definitions of your docker containers
     extends: overlay
     command: >
       ros2 launch cps_rmp220_support robot_lidar.launch.py serial_port:=/dev/ttyUSB0
-
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
-    # depends_on:
-    #   - robot_state_publisher
     environment:
     - ROS_DOMAIN_ID=5
     devices:
@@ -152,12 +134,6 @@ services: # in docker compose, service are definitions of your docker containers
     extends: overlay
     command: >
       ros2 launch cps_rmp220_support robot_localization.launch.py
-    # Interactive shell
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
     environment:
     - ROS_DOMAIN_ID=5
 
@@ -166,12 +142,6 @@ services: # in docker compose, service are definitions of your docker containers
     extends: overlay
     command: >
       ros2 launch cps_rmp220_support robot_mapping.launch.py
-    # Interactive shell
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
     environment:
     - ROS_DOMAIN_ID=5
 
@@ -180,12 +150,6 @@ services: # in docker compose, service are definitions of your docker containers
     extends: overlay
     command: >
       ros2 launch cps_rmp220_support robot_mapping_localization.launch.py map_file_name:=/repo/maps/map.yaml
-    # Interactive shell
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
     environment:
     - ROS_DOMAIN_ID=5
 
@@ -194,12 +158,6 @@ services: # in docker compose, service are definitions of your docker containers
     extends: overlay
     command: >
       ros2 launch cps_rmp220_support robot_amcl.launch.py map:=/repo/maps/map.yaml
-    # Interactive shell
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
     environment:
     - ROS_DOMAIN_ID=5
 
@@ -209,11 +167,6 @@ services: # in docker compose, service are definitions of your docker containers
     command: >
       ros2 launch cps_rmp220_support robot_navigation.launch.py
       map_subscribe_transient_local:=true
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
     environment:
     - ROS_DOMAIN_ID=5
   
@@ -222,38 +175,14 @@ services: # in docker compose, service are definitions of your docker containers
     extends: overlay
     command: >
       /bin/bash
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
-    devices:
-      - /dev/input/js0:/dev/input/js0
     environment:
     - ROS_DOMAIN_ID=5
 
   # rviz2
   rviz2:
     extends: guis
-    # command: >
-    #   ros2 launch cps_rmp220_support robot_rviz2.launch.py
     command: >
       ros2 launch cps_rmp220_support rviz.launch.py
-    # Interactive shell
-    stdin_open: true
-    tty: true
-    # Networking and IPC for ROS 2
-    network_mode: host
-    ipc: host
-    # Needed to display graphical applications
-    privileged: true
     environment:
-      # Allows graphical programs in the container.
-      - DISPLAY=${DISPLAY}
-      - QT_X11_NO_MITSHM=1
-      - NVIDIA_DRIVER_CAPABILITIES=all
-      - ROS_DOMAIN_ID=5
-    volumes:
-      # Allows graphical programs in the container.
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
+    - ROS_DOMAIN_ID=5
+   
