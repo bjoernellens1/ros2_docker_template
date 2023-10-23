@@ -1,5 +1,6 @@
-Hello, World!
-Congratulatios, you just successfully built your first docker image.
+Hello Docker Magician!
+
+Congratulations, you just successfully built your first docker image.
 
 Kind regards,
 
