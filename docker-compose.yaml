@@ -27,6 +27,7 @@ services: # in docker compose, service are definitions of your docker containers
       # Allows graphical programs in the container.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
+    network_mode: host # host networking makes life easier
 
         
   # The rest of this file is an example of how I used docker, docker-compose and buildx bake to fully automate image building for the Segway RMP-lite 220 robot platform.
@@ -50,8 +51,8 @@ services: # in docker compose, service are definitions of your docker containers
     stdin_open: true
     tty: true
     # Networking and IPC for ROS 2 --> uncomment those 2 entries if working with ros2, otherwise you might just delete this.
-    #network_mode: host # host networking makes life easier
-    #ipc: host # --> faster communications between containers
+    network_mode: host # host networking makes life easier
+    ipc: host # --> faster communications between containers
     
     # Needed to display graphical applications
     #privileged: true # Should only be set to true in development phase. This parameter is not neccessary needed, as it is very much possible to set the right access permissions first to only expose devices to the container I really want to access.
