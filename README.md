@@ -15,10 +15,19 @@ docker run --privileged --rm tonistiigi/binfmt --install all
 docker run --privileged --rm myuser/binfmt
 ```
 
-## What you will want to change in your repository:
-### my.repos and my_extended.repos:
-These are yaml files containing the repositories you may want to include into your final ros2 workspace.
-For a multi-stage build for instance, I define my base image repositories in "my.repos" and the extended image repositories in "my_extended.repos"
+## Simple build
+First things first: Let's begin with a short and simple build. This is a short hello, world! example.
+### Clone this repository to your local machine
+```
+git clone https://github.com/bjoernellens1/ros2_docker_template
+```
+### Build the hello, world! image
+```
+docker buildx bake hello-world --load # to load into local container registry
+```
+```
+docker buildx bake hello-world --push # to push into specified remote container registry
+```
 
 ## To build the image for my_example (and push it to your container registry):
 ```
@@ -51,3 +60,10 @@ docker compose exec my_example bash
 ```
 docker compose run my_example example_program
 ```
+
+## Next steps
+### Fork this repository and make it your own
+### What you will want to change in your repository:
+#### my.repos and my_extended.repos:
+These are yaml files containing the repositories you may want to include into your final ros2 workspace.
+For a multi-stage build for instance, I define my base image repositories in "my.repos" and the extended image repositories in "my_extended.repos"
