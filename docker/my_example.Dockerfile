@@ -4,5 +4,6 @@ FROM debian:bullseye-slim AS hello-world
 WORKDIR /APP
 
 COPY ./docker .
+RUN chmod +x hello.sh
 
-CMD ["cat /APP/hello.txt"]
+ENTRYPOINT ["/APP/hello.sh"]
