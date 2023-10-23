@@ -27,7 +27,7 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
    ros-${ROS_DISTRO}-rqt \
   #&& rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
-  && colcon build --symlink-install
+  && colcon build --symlink-install \
   && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
 
 #ENV UNDERLAY_WS=/base_ws
