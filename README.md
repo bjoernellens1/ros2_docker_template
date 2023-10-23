@@ -11,6 +11,8 @@ For a multi-stage build for instance, I define my base image repositories in "my
 ## To build the image for example_service (and push it to your container registry):
 ```
 docker buildx bake example_service --load # to load into local container registry
+```
+```
 docker buildx bake example_service --push # to push into specified remote container registry
 ```
 ## To run example_service:
