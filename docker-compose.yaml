@@ -17,10 +17,12 @@ services: # in docker compose, service are definitions of your docker containers
           
   # Base image containing dependencies for example the robot controller
   base:
-    image: ghcr.io/bjoernellens1/ros2_docker_template/ros2:base # this will be the output image tag. You might replace this with your own container registry
+    image: ghcr.io/bjoernellens1/ros2_docker_template/ros2:base # This tells docker where to look for the image remotely, so you don't need to build the image on your PC. You might replace this with your own container registry
     build:
       context: .
-      dockerfile: docker/Dockerfile # the Dockerfilespeciefies the steps taken in the build process.
+      dockerfile: docker/Dockerfile # the Dockerfile specifies the steps taken in the build process.
+      tags:
+        - ghcr.io/bjoernellens1/ros2_docker_template/ros2:base # this will be the output image tag. You might replace this with your own container registry
       args: # specify build arguments. May use them to alter the build process.
         ROS_DISTRO: humble # For instance you could change to foxy here.
       target: base # here you specify the build target in the Dockerfile
