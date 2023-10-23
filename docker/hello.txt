@@ -1,0 +1,8 @@
+Hello, World!
+Congratulatios, you just successfully built your first docker image.
+
+Kind regards,
+
+  The Chair of Cyber-Physical-Systems
+  Montanuniversität Leoben
+  cps.unileoben.ac.at
