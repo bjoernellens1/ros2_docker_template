@@ -33,6 +33,7 @@ fi
 
 if [ -f /overlay_ws/]
 then
+  ldconfig -v
   cd /overlay_ws
   vcs pull src
   echo "Updated overlay workspace"
