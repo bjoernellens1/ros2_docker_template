@@ -9,10 +9,7 @@ services: # in docker compose, service are definitions of your docker containers
       dockerfile: docker/hello-world.Dockerfile # the Dockerfile speciefies the steps taken in the build process.
       tags:
         - ghcr.io/bjoernellens1/ros2_docker_template/hello-world
-      target: hello-world # here you specify the build target in the Dockerfile
-      x-bake: # Definitions needed for buildx bake. This enhanced docker build system makes things much easier.
-        platforms:
-          - linux/amd64
+      target: hello-world # here you can explicitly specify the build target in the Dockerfile if there are more than one targets specified.
 
   my_example: # this already represents a more complex ros2 build process.
     image: ghcr.io/bjoernellens1/ros2_docker_template/my_example # hello-world image. No prefix means it defaults the image registry to dockerhub
