@@ -60,12 +60,13 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN source /base_ws/install/setup.bash \
   && apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install \
-    nano \
-  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
+    nano #\
+  #&& rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
   && rm -rf /var/lib/apt/lists/*
 
 RUN source /base_ws/install/setup.bash \
-  && colcon build --symlink-install
+  && colcon build --symlink-install \
+  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
 
 # Set up the entrypoint
 COPY ./docker/my_entrypoint.sh /entrypoint.sh
