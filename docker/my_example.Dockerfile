@@ -54,7 +54,8 @@ RUN vcs import < overlay.repos \
   && mv ros2_unitree_legged_msgs/ ..
 WORKDIR /lcm_ws
 RUN cd /lcm_ws \
-  && git clone -b v1.4.0 https://github.com/lcm-proj/lcm \
+  #&& git clone -b v1.4.0 https://github.com/lcm-proj/lcm \
+  && git clone https://github.com/lcm-proj/lcm \
   && cd lcm \
   && mkdir build \
   && cd build \
