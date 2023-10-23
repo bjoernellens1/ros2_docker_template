@@ -1,4 +1,4 @@
-Hello Docker Magician!
+Hello fellow Docker Magician!
 
 Congratulations, you just successfully built your first docker image.
 
