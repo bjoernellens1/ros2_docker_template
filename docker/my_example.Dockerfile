@@ -6,4 +6,4 @@ WORKDIR /APP
 COPY ./docker .
 RUN chmod +x hello.sh
 
-ENTRYPOINT ["/APP/hello.sh"]
+CMD ["/APP/hello.sh"]
