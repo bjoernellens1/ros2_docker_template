@@ -12,8 +12,8 @@ FROM osrf/ros:${ROS_DISTRO}-desktop as base
 SHELL ["/bin/bash", "-c"] # change shell to bash because of better compatibility (standard shell would be sh otherwise).
 
 # Create Colcon workspace with external dependencies
-RUN mkdir -p /${UNDERLAY_WS}/src
-WORKDIR /${UNDERLAY_WS}/src
+RUN mkdir -p ${UNDERLAY_WS}/src
+WORKDIR ${UNDERLAY_WS}/src
 COPY my.repos .
 RUN mv my.repos dependencies.repos
 RUN vcs import < dependencies.repos
@@ -63,7 +63,7 @@ RUN source ${UNDERLAY_WS}/install/setup.bash \
   && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
   && rm -rf /var/lib/apt/lists/*
 
-RUN source /rmp_ws/install/setup.bash \
+RUN source ${UNDERLAY_WS}/install/setup.bash \
   && colcon build --symlink-install
 
 # Set up the entrypoint
