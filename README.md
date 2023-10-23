@@ -1,9 +1,20 @@
 # my_ros2_docker_image
 
-Following this you will be able to do multiplatform builds with docker buildx.
-For the build with docker buildx you will need binfmt dependencies for arm64 architecture, as we are doing a multiplatform build (Works on PCs as well as Jetson Nano, Raspberry Pi, Apple Silicon Devices).
+This template repository should give a good overview on how to build your own ROS2 development instance and produce a new hosted docker image out of it.
 
-## What you will want to change:
+## Only needed for multiplatform images
+Following this guide you will also be able to do multiplatform builds with docker buildx.
+To build multiplatform images need binfmt dependencies for arm64 architecture as requirement (The resulting image works on PCs as well as Jetson Nano, Raspberry Pi, Apple Silicon Devices).
+### Install requirements
+```
+docker run --privileged --rm tonistiigi/binfmt --install all
+```
+### Uninstall
+```
+docker run --privileged --rm myuser/binfmt
+```
+
+## What you will want to change in your repository:
 ### my.repos and my_extended.repos:
 These are yaml files containing the repositories you may want to include into your final ros2 workspace.
 For a multi-stage build for instance, I define my base image repositories in "my.repos" and the extended image repositories in "my_extended.repos"
