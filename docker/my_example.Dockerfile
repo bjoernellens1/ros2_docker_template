@@ -37,6 +37,7 @@ RUN chmod +x /entrypoint.sh
 RUN vcs pull src
 
 ENTRYPOINT [ "/entrypoint.sh" ]
+CMD [ "ros2 run unitree_legged_real ros2_udp highlevel" ]
 
 
 #############################################################
