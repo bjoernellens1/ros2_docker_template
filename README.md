@@ -19,7 +19,7 @@ newgrp docker
 ```
 Source: https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script
 
-##### Only needed for multiplatform images
+##### Only needed for multiplatform images - You may safely ignore this
 Following this guide you will also be able to do multiplatform builds with docker buildx.
 To build multiplatform images need binfmt dependencies for arm64 architecture as requirement (The resulting image works on PCs as well as Jetson Nano, Raspberry Pi, Apple Silicon Devices).
 The sections for multiplatform builds are commented out in the configuration files so you also need to uncomment these lines.
