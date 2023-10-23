@@ -74,6 +74,10 @@ docker compose exec my_example bash
 ```
 docker compose run my_example example_program
 ```
+You will find that example_program does not exist. Try using rqt for example:
+```
+docker compose run my_example rqt
+```
 
 ## Next steps
 ### Fork this repository and make it your own
