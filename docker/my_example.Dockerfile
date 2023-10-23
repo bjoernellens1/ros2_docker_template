@@ -60,7 +60,7 @@ RUN cd /lcm_ws \
   && cd build \
   && cmake ../ \
   && make \
-  && make install \
+  && make install
 
 WORKDIR /overlay_ws
 
