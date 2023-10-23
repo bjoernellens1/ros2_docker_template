@@ -1,11 +1,6 @@
-repositories:  
-
-  cam_openCV:
-    type: git
-    url: https://github.com/bjoernellens1/ros2_cam_openCV.git
-    version: main
+repositories:
 
   unitree_go1:
     type: git
-    url: https://github.com/unitreerobotics/unitree_ros2_to_real.git
+    url: git clone https://github.com/dbaldwin/unitree_ros2_to_real # using the non-official repo because it won't build otherwise (source https://gist.github.com/dbaldwin/feb0d279c67e0bcb191d2b366f867a84)
     version: main
