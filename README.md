@@ -25,8 +25,13 @@ git clone https://github.com/bjoernellens1/ros2_docker_template
 ```
 docker buildx bake hello-world --load # to load into local container registry
 ```
+or
 ```
 docker buildx bake hello-world --push # to push into specified remote container registry
+```
+### Run the hello, world! image
+```
+docker compose run hello-world
 ```
 
 ## To build the image for my_example (and push it to your container registry):
