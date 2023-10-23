@@ -102,7 +102,7 @@ jobs:
           # Load is a shorthand for --set=*.output=type=docker
           #load: # optional, default is false
           # Provenance is a shorthand for --set=*.attest=type=provenance
-          provenance: # optional
+          #provenance: # optional
           # Push is a shorthand for --set=*.output=type=registry
           push: true # optional, default is false
           # SBOM is a shorthand for --set=*.attest=type=sbom
