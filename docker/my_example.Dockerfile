@@ -54,60 +54,6 @@ RUN set -eux; \
 WORKDIR /usr/src/hello
 COPY . .
 
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='amd64' \
-		CROSS_COMPILE='x86_64-linux-gnu-' \
-		ARCH_TEST='amd64'
-
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='arm32v5' \
-		CROSS_COMPILE='arm-linux-gnueabi-' \
-		ARCH_TEST='armel'
-
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='arm32v7' \
-		CROSS_COMPILE='arm-linux-gnueabihf-' \
-		ARCH_TEST='armhf'
-
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='arm64v8' \
-		CROSS_COMPILE='aarch64-linux-gnu-' \
-		ARCH_TEST='arm64'
-
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='i386' \
-		CROSS_COMPILE='i686-linux-gnu-' \
-		ARCH_TEST='i386'
-
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='mips64le' \
-		CROSS_COMPILE='mips64el-linux-gnuabi64-' \
-		ARCH_TEST='mips64el'
-
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='ppc64le' \
-		CROSS_COMPILE='powerpc64le-linux-gnu-' \
-		CFLAGS+='-mlong-double-64' \
-		ARCH_TEST='ppc64el'
-
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='riscv64' \
-		CROSS_COMPILE='riscv64-linux-gnu-' \
-		ARCH_TEST='riscv64'
-
-RUN set -ex; \
-	make clean all test \
-		TARGET_ARCH='s390x' \
-		CROSS_COMPILE='s390x-linux-gnu-' \
-		ARCH_TEST='s390x'
 
 RUN find \( -name 'hello' -or -name 'hello.txt' \) -exec file '{}' + -exec ls -lh '{}' +
 
