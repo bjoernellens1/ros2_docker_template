@@ -13,4 +13,16 @@ docker buildx bake example_service --load
 docker buildx bake example_service --push
 
 ## To run example_service:
+### Run example_service in background
 docker compose up -d example_service
+
+### Run example_service in foreground
+docker compose up example_service
+
+### Execute shell inside example_service
+#### If container is stopped
+docker compose run example_service bash
+#### If container is already running
+docker compose exec example_service bash
+### Execute example_program inside example_service
+docker compose run example_service example_program
