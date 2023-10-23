@@ -25,9 +25,10 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && apt-get install -y --no-install-recommends \
    ros-${ROS_DISTRO}-turtlesim \
    ros-${ROS_DISTRO}-rqt \
-  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
+  #&& rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && colcon build --symlink-install
+  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
 
 #ENV UNDERLAY_WS=/base_ws
 
