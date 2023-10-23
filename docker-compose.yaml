@@ -25,15 +25,15 @@ services: # in docker compose, service are definitions of your docker containers
       x-bake: # Definitions needed for buildx bake. This enhanced docker build system makes things much easier.
         platforms:
           - linux/amd64
-      environment:
-        # Allows graphical programs in the container.
-        - DISPLAY=${DISPLAY}
-        - QT_X11_NO_MITSHM=1
-        - NVIDIA_DRIVER_CAPABILITIES=all # For Nvidia hardware acceleration (CUDA, ...). This might additionally need some extra tools installed (Nvidia Container Toolkit?)
-      volumes:
-        # Allows graphical programs in the container.
-        - /tmp/.X11-unix:/tmp/.X11-unix:rw
-        - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
+    environment:
+      # Allows graphical programs in the container.
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_DRIVER_CAPABILITIES=all # For Nvidia hardware acceleration (CUDA, ...). This might additionally need some extra tools installed (Nvidia Container Toolkit?)
+    volumes:
+      # Allows graphical programs in the container.
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
 
         
   # The rest of this file is an example of how I used docker, docker-compose and buildx bake to fully automate image building for the Segway RMP-lite 220 robot platform.
