@@ -5,4 +5,4 @@ WORKDIR /APP
 
 COPY ./docker .
 
-CMD ["cat ./hello.txt"]
+CMD ["cat /APP/hello.txt"]
