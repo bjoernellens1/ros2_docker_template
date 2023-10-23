@@ -12,6 +12,7 @@ FROM osrf/ros:${ROS_DISTRO}-desktop as base
 SHELL ["/bin/bash", "-c"] # change shell to bash because of better compatibility (standard shell would be sh otherwise).
 
 # Create Colcon workspace with external dependencies
+# This step sources our external repositories from the internet
 RUN mkdir -p /base_ws/src
 WORKDIR /base_ws/src
 COPY my.repos .
@@ -20,12 +21,13 @@ RUN vcs import < dependencies.repos
 
 # Build the base Colcon workspace, installing dependencies first.
 WORKDIR /base_ws
+# Wherever possible, install packages from apt instead of compiling from source. This is faster and more reliable.
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && apt-get update -y \
   && apt-get install -y --no-install-recommends \
    ros-${ROS_DISTRO}-turtlesim \
    ros-${ROS_DISTRO}-rqt \
-  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
+  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y #This makes sure all dependencies are installed for our external sources.
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && colcon build --symlink-install
 
