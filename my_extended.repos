@@ -2,5 +2,5 @@ repositories:
 
   unitree_go1:
     type: git
-    url: git clone https://github.com/dbaldwin/unitree_ros2_to_real # using the non-official repo because it won't build otherwise (source https://gist.github.com/dbaldwin/feb0d279c67e0bcb191d2b366f867a84)
+    url: https://github.com/dbaldwin/unitree_ros2_to_real # using the non-official repo because it won't build otherwise (source https://gist.github.com/dbaldwin/feb0d279c67e0bcb191d2b366f867a84)
     version: main
