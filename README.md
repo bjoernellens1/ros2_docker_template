@@ -76,3 +76,8 @@ docker compose run my_example example_program
 #### my.repos and my_extended.repos:
 These are yaml files containing the repositories you may want to include into your final ros2 workspace.
 For a multi-stage build for instance, I define my base image repositories in "my.repos" and the extended image repositories in "my_extended.repos"
+
+## Additional Resources
+For further references please visit my WIP repositories for mobile robotic platforms:
+- https://github.com/bjoernellens1/ros2_rmp
+- https://github.com/bjoernellens1/cps_bot_mini_ws
