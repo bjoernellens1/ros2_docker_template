@@ -3,7 +3,7 @@
 This template repository should give a good overview on how to build your own ROS2 development instance and produce a new hosted docker image out of it.
 
 ## Install dependencies needed for working with docker images and tools to make your life easier
-Using the official Docker convenience instaler script, we will install docker and docker compose:
+Using the official Docker convenience installer script, we will install docker and docker compose:
 ```
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
