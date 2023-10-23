@@ -2,7 +2,7 @@ version: "3.9"
 
 services: # in docker compose, service are definitions of your docker containers
 
-  my_example: # for this example I am using a very simple docker build for reference: hello-world
+  my_example: # for this example I am using a very simple docker build for reference: hello-world (builds very fast)
     image: hello-world # hello-world image. No prefix means it defaults the image registry to dockerhub
     build:
       context: .
@@ -13,9 +13,11 @@ services: # in docker compose, service are definitions of your docker containers
           #- linux/arm64 uncomment if arm64 platform is needed (like jetson nano or raspberry pi)
           - linux/amd64
           
+  # The rest of this file is an example of how I used docker, docker-compose and buildx bake to fully automate image building for the Segway RMP-lite 220 robot platform.
+          
   # Base image containing dependencies for example the robot controller
   base:
-    image: ghcr.io/bjoernellens1/ros2_rmp/rmp:base # this will be the output image tag
+    image: ghcr.io/bjoernellens1/ros2_docker_template/ros2:base # this will be the output image tag. You might replace this with your own container registry
     build:
       context: .
       dockerfile: docker/Dockerfile # the Dockerfilespeciefies the steps taken in the build process.
@@ -26,56 +28,55 @@ services: # in docker compose, service are definitions of your docker containers
         platforms:
           #- linux/arm64 uncomment if arm64 platform is needed (like jetson nano or raspberry pi)
           - linux/amd64
-
     # Interactive shell enable
     stdin_open: true
     tty: true
-    # Networking and IPC for ROS 2 
-    network_mode: host # host networking makes life easier
-    ipc: host # --> faster communications between containers
+    # Networking and IPC for ROS 2 --> uncomment those 2 entries if working with ros2, otherwise you might just delete this.
+    #network_mode: host # host networking makes life easier
+    #ipc: host # --> faster communications between containers
     
     # Needed to display graphical applications
-    privileged: true # also needed for hardware access like joystick, cameras...
+    #privileged: true # Should only be set to true in development phase. This parameter is not neccessary needed, as it is very much possible to set the right access permissions first to only expose devices to the container I really want to access.
     environment:
       # Allows graphical programs in the container.
       - DISPLAY=${DISPLAY}
       - QT_X11_NO_MITSHM=1
-      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all # For Nvidia hardware acceleration (CUDA, ...). This might additionally need some extra tools installed (Nvidia Container Toolkit?)
     volumes:
       # Allows graphical programs in the container.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
     devices: # all devices you may need inside the docker container (for instance I needed a joystick here)
-      - /dev/input/js0:/dev/input/js0 # mapping in docker is always host_path:container_path
+      - /dev/input/js0:/dev/input/js0 # mapping in docker is always host_path:container_path. Also, correct permissions must be set, when container is not run in privileged mode.
 
-  # Overlay image containing the extended project packages. For instance Mapping, Navigation which may run on a separate PC, so I divided that from the base image.
+  # Overlay image containing the extended project packages. You may want to separate your basic setup from your project specific setup for instance to improve portability. In my case I separated the essential ROS2 packages from extended usecase packages.
   overlay:
-    extends: base # this means you take the base image as reference and run your service on top of that
-    image: ghcr.io/bjoernellens1/ros2_rmp/rmp:overlay
+    extends: base # this means you take the base image as reference and run your service on top of that. Since this service ectends base, all defined environment variables and mount points I defined before remain intact, all new definitions can be seen as "overrides".
+    image: ghcr.io/bjoernellens1/ros2_docker_template/ros2:overlay # you might replace this with your own container registry
     build:
       context: .
       dockerfile: docker/Dockerfile
       tags:
         - ghcr.io/bjoernellens1/ros2_rmp/rmp:overlay
-      target: overlay
+      target: overlay # which section in the Dockerfile should be built.
       x-bake:
         platforms:
           #- linux/arm64 uncomment if arm64 platform is needed (like jetson nano or raspberry pi)
           - linux/amd64
     volumes:
-      - .:/repo
+      - .:/repo # mounting this folder into the container under /repo ( that means that files in this repository are directly accessible inside the container --> easy way to save changes made to files.
     command: >
       /bin/bash
 
   # Additional dependencies for GUI applications: For my configuration, this last (biggest size) image will house the additional GUI tools like rviz2, gazebo, etc. This comes last as this extends the previous images. Won't be needed running on the robot. More suited for visualization, analysis or control on a separate PC.
   guis:
     extends: overlay
-    image: ghcr.io/bjoernellens1/ros2_rmp/rmp:guis
+    image: ghcr.io/bjoernellens1/ros2_docker_template/ros2:guis
     build:
       context: .
       dockerfile: docker/Dockerfile
       tags:
-        - ghcr.io/bjoernellens1/ros2_rmp/rmp:guis
+        - ghcr.io/bjoernellens1/ros2_docker_template/ros2:guis
       target: guis
       x-bake:
         platforms:
@@ -86,8 +87,8 @@ services: # in docker compose, service are definitions of your docker containers
       /bin/bash
   
   # The following service definitions do not include build instructions as they do not require additional content in the images. Meaning, if you already have the image locally, everything's fine. If you don't have the image locally, docker compose will download the image from the image registry for you. If docker compose does not have access to the image registry, it will build the corresponding image for you (so better make sur you have access).
-# You can see these service definitions as an easy way to spin up separate containers for launching separate tasks. I use this to control the current operational mode of the robot (mapping or navigation an localization). In the end it's just spinning up launch files in separate containers.
-# Note that service definitions will always inherit the preferences from their "parent" service. However, you can overwrite them.
+  # You can see these service definitions as an easy way to spin up separate containers for launching separate tasks. I use this to control the current operational mode of the robot (mapping or navigation an localization). In the end it's just spinning up launch files in separate containers.
+  # Note that service definitions will always inherit the preferences from their "parent" service. However, you can overwrite them.
 
   # Robot State Publisher
   rsp:
