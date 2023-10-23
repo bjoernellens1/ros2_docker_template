@@ -28,13 +28,15 @@ docker buildx bake my_example --load # to load into local container registry
 docker buildx bake my_example --push # to push into specified remote container registry
 ```
 ## To run my_example:
+### Run my_example just once to see if everything's working:
+
 ### Run my_example in background
 ```
-docker compose up -d example_service
+docker compose up -d my_example
 ```
 ### Run my_example in foreground
 ```
-docker compose up example_service
+docker compose up my_example
 ```
 ### Execute shell inside my_example
 #### If container is stopped
