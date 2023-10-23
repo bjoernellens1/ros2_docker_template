@@ -2,6 +2,23 @@
 
 This template repository should give a good overview on how to build your own ROS2 development instance and produce a new hosted docker image out of it.
 
+## Install dependencies needed for working with docker images and tools to make your life easier
+Using the official Docker convenience instaler script, we will install docker and docker compose:
+```
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+Then add yourself to the docker group so you must not always use sudo when tinkering with docker commands:
+```
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+Update the group changes:
+```
+newgrp docker
+```
+Source: https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script
+
 ##### Only needed for multiplatform images
 Following this guide you will also be able to do multiplatform builds with docker buildx.
 To build multiplatform images need binfmt dependencies for arm64 architecture as requirement (The resulting image works on PCs as well as Jetson Nano, Raspberry Pi, Apple Silicon Devices).
