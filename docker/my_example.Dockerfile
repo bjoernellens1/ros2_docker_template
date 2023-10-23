@@ -3,4 +3,4 @@ FROM debian:bullseye-slim AS hello-world
 
 COPY ./docker .
 
-CMD ["< ./hello.txt"]
+CMD ["cat ./hello.txt"]
