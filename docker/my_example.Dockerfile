@@ -11,6 +11,10 @@ FROM osrf/ros:${ROS_DISTRO}-desktop as base
 
 SHELL ["/bin/bash", "-c"] # change shell to bash because of better compatibility (standard shell would be sh otherwise).
 
+# First checks
+RUN echo "Underlay WS: ${UNDERLAY_WS}"
+RUN echo "Overlay WS: ${Overlay_WS}"
+
 # Create Colcon workspace with external dependencies
 RUN mkdir -p ${UNDERLAY_WS}/src
 WORKDIR ${UNDERLAY_WS}/src
