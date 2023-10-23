@@ -1,5 +1,6 @@
 ARG ROS_DISTRO=humble
-ARG UNDERLAY_WS=/rmp_ws
+ARG UNDERLAY_WS=/base_ws
+ARG OVERLAY_WS=/overlay_ws
 
 ########################################
 # Custom ROS2 Base Image               #
@@ -29,6 +30,41 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && colcon build --symlink-install
 
 #ENV UNDERLAY_WS=${UNDERLAY_WS}
+
+# Set up the entrypoint
+COPY ./docker/my_entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Update repository at the end of this build stage
+RUN vcs pull src
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+
+###########################################
+# Overlay Image                           #
+###########################################
+FROM base AS overlay
+
+# Create an overlay Colcon workspace
+RUN mkdir -p ${OVERLAY_WS}/src
+WORKDIR ${OVERLAY_WS}/src
+COPY my_extended.repos ./overlay.repos
+RUN vcs import < overlay.repos
+
+WORKDIR ${OVERLAY_WS}
+
+ENV DEBIAN_FRONTEND noninteractive 
+
+RUN source ${UNDERLAY_WS}/install/setup.bash \
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install \
+    nano \
+  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN source /rmp_ws/install/setup.bash \
+  && colcon build --symlink-install
 
 # Set up the entrypoint
 COPY ./docker/my_entrypoint.sh /entrypoint.sh
