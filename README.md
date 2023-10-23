@@ -20,32 +20,32 @@ docker run --privileged --rm myuser/binfmt
 These are yaml files containing the repositories you may want to include into your final ros2 workspace.
 For a multi-stage build for instance, I define my base image repositories in "my.repos" and the extended image repositories in "my_extended.repos"
 
-## To build the image for example_service (and push it to your container registry):
+## To build the image for my_example (and push it to your container registry):
 ```
-docker buildx bake example_service --load # to load into local container registry
+docker buildx bake my_example --load # to load into local container registry
 ```
 ```
-docker buildx bake example_service --push # to push into specified remote container registry
+docker buildx bake my_example --push # to push into specified remote container registry
 ```
-## To run example_service:
-### Run example_service in background
+## To run my_example:
+### Run my_example in background
 ```
 docker compose up -d example_service
 ```
-### Run example_service in foreground
+### Run my_example in foreground
 ```
 docker compose up example_service
 ```
-### Execute shell inside example_service
+### Execute shell inside my_example
 #### If container is stopped
 ```
-docker compose run example_service bash
+docker compose run my_example bash
 ```
 #### If container is already running
 ```
-docker compose exec example_service bash
+docker compose exec my_example bash
 ```
-### Execute example_program inside example_service
+### Execute example_program inside my_example
 ```
-docker compose run example_service example_program
+docker compose run my_example example_program
 ```
