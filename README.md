@@ -34,16 +34,20 @@ docker buildx bake hello-world --push # to push into specified remote container 
 docker compose run hello-world
 ```
 
-## To build the image for my_example (and push it to your container registry):
+## Advanced build: Custom ROS2 image that includes the Unitree GO1 package.
 ```
 docker buildx bake my_example --load # to load into local container registry
 ```
+or
 ```
 docker buildx bake my_example --push # to push into specified remote container registry
 ```
 ## To run my_example:
 ### Run my_example just once to see if everything's working:
-
+This will launch the Unitree udp high-level control node.
+```
+docker compose run my_example
+```
 ### Run my_example in background
 ```
 docker compose up -d my_example
