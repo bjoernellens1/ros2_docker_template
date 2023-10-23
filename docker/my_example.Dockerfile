@@ -25,7 +25,7 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && apt-get install -y --no-install-recommends \
    ros-${ROS_DISTRO}-turtlesim \
    ros-${ROS_DISTRO}-rqt \
-  #&& rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
+  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && colcon build --symlink-install
 
@@ -71,7 +71,7 @@ RUN source /base_ws/install/setup.bash \
   && apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install \
     nano \
-  && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
+  #&& rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y \
   && rm -rf /var/lib/apt/lists/*
 
 RUN source /base_ws/install/setup.bash \
