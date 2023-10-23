@@ -9,7 +9,7 @@ services: # in docker compose, service are definitions of your docker containers
       dockerfile: docker/hello-world.Dockerfile # the Dockerfile speciefies the steps taken in the build process.
       tags:
         - ghcr.io/bjoernellens1/ros2_docker_template/hello-world
-      target: hello-world # here you can explicitly specify the build target in the Dockerfile if there are more than one targets specified.
+      target: hello-world # here you can explicitly specify the build target in the Dockerfile if you want only a specific build step for this service.
 
   my_example: # this already represents a more complex ros2 build process.
     image: ghcr.io/bjoernellens1/ros2_docker_template/my_example # hello-world image. No prefix means it defaults the image registry to dockerhub
