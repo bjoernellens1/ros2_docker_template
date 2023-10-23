@@ -24,7 +24,7 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && apt-get update -y \
   && apt-get install -y --no-install-recommends \
    ros-${ROS_DISTRO}-turtlesim \
-   ros-${ROS_DISTRO}-rqt\
+   ros-${ROS_DISTRO}-rqt \
   && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
   && colcon build --symlink-install
@@ -49,7 +49,7 @@ RUN mkdir -p /overlay_ws/src
 WORKDIR /overlay_ws/src
 COPY my_extended.repos ./overlay.repos
 RUN vcs import < overlay.repos \
-  && cd unitree_ros2_to_real \
+  && cd unitree_go1 \
   && git clone -b v3.5.1 https://github.com/unitreerobotics/unitree_legged_sdk \
   && mv ros2_unitree_legged_msgs/ ..
 WORKDIR /lcm_ws
